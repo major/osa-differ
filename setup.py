@@ -39,6 +39,7 @@ setup(
     description="Find changes between OpenStack-Ansible versions",
     install_requires=required_packages,
     packages=['osa_differ'],
+    package_data={'': ['LICENSE, README.rst']},
     include_package_data=True,
     url='https://github.com/major/osa-differ',
     entry_points='''
