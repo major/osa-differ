@@ -352,13 +352,15 @@ def repo_pull(repo_dir, repo_url, fetch=False):
     """Reset repository and optionally update it."""
     # Make sure the repository is reset to the master branch.
     repo = Repo(repo_dir)
-    repo.heads.master.checkout()
+    repo.git.clean("-df")
+    repo.git.reset("--hard")
+    repo.git.checkout("master")
     repo.head.reset(index=True, working_tree=True)
 
     # Only get the latest updates if requested.
     if fetch:
-        repo.remotes['origin'].pull()
-
+        repo.git.fetch([repo_url, "+refs/heads/*:refs/remotes/origin/*"])
+        repo.git.reset(["--hard", "FETCH_HEAD"])
     return repo
 
 
@@ -366,7 +368,7 @@ def update_repo(repo_dir, repo_url, fetch=False):
     """Clone the repo if it doesn't exist already, otherwise update it."""
     repo_exists = os.path.exists(repo_dir)
     if repo_exists:
-        log.info("Pulling repo {} (fetch: {})".format(repo_url, fetch))
+        log.info("Fetching repo {} (fetch: {})".format(repo_url, fetch))
         repo = repo_pull(repo_dir, repo_url, fetch)
     else:
         log.info("Cloning repo {}".format(repo_url))
