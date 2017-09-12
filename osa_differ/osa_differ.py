@@ -42,8 +42,8 @@ log.addHandler(stdout_handler)
 
 
 def create_parser():
-    """Setup argument Parsing."""
-    description = """OpenStack-Ansible Release Diff Generator
+    """Create argument parser."""
+    description = """Generate OpenStack-Ansible Diff
 ----------------------------------------
 
 Finds changes in OpenStack projects and OpenStack-Ansible roles between two
@@ -379,14 +379,16 @@ def update_repo(repo_dir, repo_url, fetch=False):
 
 def validate_commits(repo_dir, commits):
     """Test if a commit is valid for the repository."""
+    log.debug("Validating {c} exist in {r}".format(c=commits, r=repo_dir))
     repo = Repo(repo_dir)
     for commit in commits:
         try:
             commit = repo.commit(commit)
         except:
-            msg = ("Commit {0} could not be found. You may need to pass "
-                   "--update to fetch the latest updates to the git "
-                   "repositories stored on you local computer.".format(commit))
+            msg = ("Commit {commit} could not be found in repo {repo}. "
+                   "You may need to pass --update to fetch the latest "
+                   "updates to the git repositories stored on "
+                   "your local computer.".format(repo=repo_dir, commit=commit))
             raise exceptions.InvalidCommitException(msg)
 
     return True
@@ -548,7 +550,7 @@ def _fix_tags_list(tags):
 
 
 def run_osa_differ():
-    """The script starts here."""
+    """Start here."""
     # Get our arguments from the command line
     args = parse_arguments()
 
