@@ -232,7 +232,7 @@ def make_report(storage_directory, old_pins, new_pins, do_update=False):
         # added projects and roles.
         try:
             commit_sha_old = next(x[2] for x in old_pins if x[0] == repo_name)
-        except:
+        except Exception:
             continue
 
         # Loop through the commits and render our template.
@@ -390,7 +390,7 @@ def validate_commits(repo_dir, commits):
     for commit in commits:
         try:
             commit = repo.commit(commit)
-        except:
+        except Exception:
             msg = ("Commit {commit} could not be found in repo {repo}. "
                    "You may need to pass --update to fetch the latest "
                    "updates to the git repositories stored on "
@@ -405,14 +405,14 @@ def validate_commit_range(repo_dir, old_commit, new_commit):
     # Are there any commits between the two commits that were provided?
     try:
         commits = get_commits(repo_dir, old_commit, new_commit)
-    except:
+    except Exception:
         commits = []
     if len(commits) == 0:
         # The user might have gotten their commits out of order. Let's flip
         # the order of the commits and try again.
         try:
             commits = get_commits(repo_dir, new_commit, old_commit)
-        except:
+        except Exception:
             commits = []
         if len(commits) == 0:
             # Okay, so there really are no commits between the two commits
