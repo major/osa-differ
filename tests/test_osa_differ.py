@@ -554,6 +554,16 @@ novncproxy_git_project_group: nova_console
         assert result.active_branch.name == 'master'
         assert not result.is_dirty()
 
+    def test_valid_repo_url(self, tmpdir):
+        """Ensure that valid git URL passes validation."""
+        assert osa_differ.validate_repo(
+            "https://github.com/rcbops/rpc-openstack")
+
+    def test_invalid_repo_url(self, tmpdir):
+        """Ensure that invalid git URL fails validation."""
+        assert not osa_differ.validate_repo(
+            "there_is_no_spoon")
+
     def test_get_release_notes(self, tmpdir):
         """Ensure getting release notes works."""
         p = tmpdir.mkdir('releasenotes')

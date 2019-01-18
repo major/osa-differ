@@ -24,6 +24,8 @@ import sys
 from collections import defaultdict
 from distutils.version import LooseVersion
 
+
+import git
 from git import Repo
 
 import jinja2
@@ -257,7 +259,12 @@ def get_roles(osa_repo_dir, commit, role_requirements):
     with open(filename, 'r') as f:
         roles_yaml = yaml.load(f)
 
-    return normalize_yaml(roles_yaml)
+    validated_roles = []
+    for role in roles_yaml:
+        if validate_repo(role['src']):
+            validated_roles.append(role.copy())
+
+    return normalize_yaml(validated_roles)
 
 
 def make_osa_report(repo_dir, old_commit, new_commit,
@@ -418,6 +425,17 @@ def render_template(template_file, template_vars):
     rendered = jinja_env.get_template(template_file).render(template_vars)
 
     return rendered
+
+
+def validate_repo(repo_url):
+    """Test whether this repository exists."""
+    try:
+        return git.cmd.Git().ls_remote(repo_url) is not None
+    except git.exc.GitCommandError:
+        log.debug(
+            "The following URL is inaccessible, skipping it:"
+            " {h}".format(h=repo_url))
+        return False
 
 
 def repo_clone(repo_dir, repo_url):
